@@ -105,14 +105,14 @@ public class ProduitService {
                 
                 DBObject o = cursor.next();
                 
-                //if(o.get("nom") == nom){
+                if(o.get("nom") == nom){
                    
                     p.setNom((String) o.get("nom"));
                     p.setLieu((String) o.get("lieu"));
                     p.setQuantite((Integer) o.get("quantite"));
                 
                 list.add(p);
-                //}
+                }
                 
             }
           
@@ -151,7 +151,7 @@ public class ProduitService {
             BasicDBObject query = new BasicDBObject();
             query = (BasicDBObject) bCursor.next();
             
-            if(query.get("nom") == nom){
+            if(query.get("nom").equals(nom)){
                 
                 document.put("nom", nom);
                 document.put("quantite", quantite);
@@ -187,9 +187,7 @@ public class ProduitService {
      **/
     @PUT
     @Path("modif/{nom}/{quantite}")
-    @Consumes({ MediaType.TEXT_HTML})
-    @Produces({MediaType.APPLICATION_JSON})
-    public String updateQuantiteProduit(@PathParam("nom") String nom, int quantite){
+    public String updateQuantiteProduit(@PathParam("nom") String nom, @PathParam("quantite") int quantite){
         
         MongoDBAcces dbSingleton = MongoDBAcces.getInstance();
 
@@ -197,15 +195,17 @@ public class ProduitService {
 
         DBCollection collection = db.getCollection("produit");             
 
+        
         BasicDBObject query = new BasicDBObject();
         
         BasicDBObject updateQuantite = new BasicDBObject();
         
         Document document = new Document();
         
-        
         query.put("nom", nom);
         updateQuantite.put("quantite", quantite);
+        System.out.println("QUERY "+ query);
+        System.out.println("update "+ updateQuantite);
         
         DBCursor cursor = collection.find(query);
 
@@ -213,7 +213,7 @@ public class ProduitService {
                 
                 DBObject o = cursor.next();
                 
-                if ( o.get("nom") == (Object) nom) {
+                if ( o.get("nom").equals(nom)) {
                     
                     o.put("quantite", quantite);
                     

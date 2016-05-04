@@ -48,7 +48,6 @@ public class MongoDBAcces {
                  if(db == null){
 
                        db = mongoClient.getDB(dbName);
-                       System.out.println("On y est");
                  }				  
 
                  return db;
