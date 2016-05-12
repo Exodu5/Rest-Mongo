@@ -6,5 +6,6 @@ Use Methods = PUT, POST, GET, DELETE
 
 This REST was create to be devellop on a local server.
 
-Develop in Java with a wildfly server and Rest Easy
+Develop in Java with a wildfly server and Rest Easy with Netbeans
+
 
