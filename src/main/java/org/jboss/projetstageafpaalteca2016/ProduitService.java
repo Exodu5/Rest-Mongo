@@ -17,9 +17,12 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.UpdateResult;
+import com.mongodb.util.JSON;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.LocalBean;
+import javax.json.Json;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -127,7 +130,7 @@ public class ProduitService {
     @POST
     @Path("insert/{nom}/{quantite}/{lieu}")
     public String insertProduit(@PathParam("nom") String nom, @PathParam("quantite") int quantite, @PathParam("lieu") String lieu){
-        
+
         MongoClient client = new MongoClient(host, port);
         MongoDatabase database = client.getDatabase(NOM_DATABASE_RAM);
         MongoCollection mongoCollection = database.getCollection("produit");
@@ -138,14 +141,54 @@ public class ProduitService {
                 document
                 .append("nom", nom)
                 .append("quantite", quantite)
-                .append("lieu", lieu)
+                
+                
         );
                 
         System.out.println(document.toString());
- 
+        
         return document.getString("nom") + " a ete enregistre";
        
     }
+    
+    
+    @POST
+    @Path("biginsert/{values}")
+    @Consumes({MediaType.APPLICATION_JSON})
+    public void bigInsert(@PathParam("values") String values){
+        
+        MongoClient client = new MongoClient(host, port);
+        MongoDatabase database = client.getDatabase(NOM_DATABASE_RAM);
+        MongoCollection mongoCollection = database.getCollection("produit");
+        
+        
+        Document document = Document.parse(values);
+        
+        mongoCollection.insertOne(document);
+
+        
+    }
+    
+    
+    
+    @POST
+    @Path("genins/{valeurs}")
+    public void InsertProduitGeneral(@PathParam("valeurs") String valeurs){
+        
+        MongoClient client = new MongoClient(host, port);
+        MongoDatabase database = client.getDatabase(NOM_DATABASE_RAM);
+        MongoCollection mongoCollection = database.getCollection("produit");
+        
+        String json = "{" + valeurs + "}";
+        
+        DBObject dbObject = (DBObject)JSON.parse(json);
+        
+        mongoCollection.insertOne(dbObject);
+        
+        
+    }
+    
+   
     
     
     
@@ -173,6 +216,24 @@ public class ProduitService {
         
         
         return nom + " " + "a bien ete modifié(e) la quantite est de "+ quantite;
+    }
+    
+    @PUT
+    @Path("newvalue/{nom}/{key}/{value}")
+    public String insertNewValueKey(@PathParam("nom") String nom, @PathParam("key") String key, @PathParam("value") String value) {
+        
+        MongoClient client = new MongoClient(host, port);
+        MongoDatabase database = client.getDatabase(NOM_DATABASE_RAM);
+        MongoCollection mongoCollection = database.getCollection("produit");
+
+        Document doc1 = new Document("nom", nom);
+        Document doc2 = new Document("$set", new Document(key, value));
+        
+        UpdateResult result =  mongoCollection.updateOne(doc1, doc2);
+
+        System.out.println("UpdateResult: " + result.toString());
+        
+        return "Hello";
     }
     
     
