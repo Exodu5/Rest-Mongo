@@ -153,7 +153,12 @@ public class ProduitService {
        
     }
     
-    
+    /**
+     *Methode d'insert d'objet en JSson
+     *@Consumes Json
+     *@return String
+     **/
+
     @POST
     @Path("biginsert/{values}")
     @Consumes({MediaType.APPLICATION_JSON})
