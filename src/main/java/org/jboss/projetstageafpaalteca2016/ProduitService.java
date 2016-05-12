@@ -18,6 +18,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.util.JSON;
+import com.mongodb.util.JSONParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 
 /**
@@ -155,7 +157,7 @@ public class ProduitService {
     @POST
     @Path("biginsert/{values}")
     @Consumes({MediaType.APPLICATION_JSON})
-    public void bigInsert(@PathParam("values") String values){
+    public String bigInsert(@PathParam("values") String values) throws JSONParseException{
         
         MongoClient client = new MongoClient(host, port);
         MongoDatabase database = client.getDatabase(NOM_DATABASE_RAM);
@@ -164,34 +166,24 @@ public class ProduitService {
         
         Document document = Document.parse(values);
         
+        FindIterable<Document> iterable = mongoCollection.find(document);
+        
+        if(iterable.first() == null){
+            
+            mongoCollection.insertOne(document);
+            
+        }
+        
         mongoCollection.insertOne(document);
-
         
+        ObjectId objId = document.getObjectId(document);
+        
+        String id = objId.toString();
+        
+        return id;
     }
     
-    
-    
-    @POST
-    @Path("genins/{valeurs}")
-    public void InsertProduitGeneral(@PathParam("valeurs") String valeurs){
         
-        MongoClient client = new MongoClient(host, port);
-        MongoDatabase database = client.getDatabase(NOM_DATABASE_RAM);
-        MongoCollection mongoCollection = database.getCollection("produit");
-        
-        String json = "{" + valeurs + "}";
-        
-        DBObject dbObject = (DBObject)JSON.parse(json);
-        
-        mongoCollection.insertOne(dbObject);
-        
-        
-    }
-    
-   
-    
-    
-    
     /**
      * 
      *Methode de modification du produit
